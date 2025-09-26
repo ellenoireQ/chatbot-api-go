@@ -1,15 +1,9 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
 	"genai/genai/api"
 	"genai/genai/db"
-	"genai/genai/func/generate"
-	"log"
-	"os"
-	"strings"
-	"sync"
+	"genai/genai/func/prompt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,43 +11,24 @@ import (
 
 func main() {
 	
-	reader := bufio.NewReader(os.Stdin)
-	var mu sync.Mutex
 	dbChat := []db.Message{}
 
 
-	go func() {
-		router := gin.Default()
-		router.GET("/chat", func(c *gin.Context) {
-			mu.Lock()
-			defer mu.Unlock()
-			api.GetChat(c, dbChat)
-		})
-		router.Run("localhost:8080")
-	}()
+	router := gin.Default()
+	router.GET("/chat", func(c *gin.Context) {
+		api.GetChat(c, dbChat)
+	})
+	router.POST("/prompt", func(c *gin.Context) {
+		var req struct {
+        Message string `json:"message"`
+    }
+    if err := c.BindJSON(&req); err != nil {
+        c.JSON(400, gin.H{"error": "invalid request"})
+        return
+    }
+    prompt.Prompt(c, &dbChat, req.Message)
+	})
+	router.Run("localhost:8080")
 	
-	for {
-	fmt.Print("You: ")
-		inputUser, _ := reader.ReadString('\n')
-		inputUser = strings.TrimSpace(inputUser)
-
-		if inputUser == "exit" {
-			fmt.Println("Bye!")
-			break
-		}
-
-
-	newChat, err := generate.GenerateChat(inputUser)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dbChat = append(dbChat, db.Message{User: db.User{Role: "user", Content: inputUser}, Assistant: db.Assistant{Role: "assistant", Content: newChat}})
-	for _, m := range dbChat {
-		fmt.Printf("[%s]: %s\n", m.User.Role, m.User.Content)
-	}
-
-
-	}
 }
 
