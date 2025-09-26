@@ -41,18 +41,16 @@ func main() {
 			fmt.Println("Bye!")
 			break
 		}
-	
-	dbChat = append(dbChat, db.Message{Role: "user", Content: inputUser})
 
-	newChat, err := generate.GenerateChat(dbChat)
+
+	newChat, err := generate.GenerateChat(inputUser)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	dbChat = append(dbChat, db.Message{Role: "assistant", Content: newChat})
-
+	dbChat = append(dbChat, db.Message{User: db.User{Role: "user", Content: inputUser}, Assistant: db.Assistant{Role: "assistant", Content: newChat}})
 	for _, m := range dbChat {
-		fmt.Printf("[%s]: %s\n", m.Role, m.Content)
+		fmt.Printf("[%s]: %s\n", m.User.Role, m.User.Content)
 	}
 
 

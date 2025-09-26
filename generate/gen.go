@@ -2,14 +2,13 @@ package generate
 
 import (
 	"context"
-	"genai/genai/db"
 	"genai/genai/pkg"
 
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
 )
 
-func GenerateChat(messages []db.Message) (string, error) {
+func GenerateChat(messages string) (string, error) {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(pkg.LoadEnv("GEMINI_API_KEY")))
 	if err != nil {
@@ -19,14 +18,8 @@ func GenerateChat(messages []db.Message) (string, error) {
 
 	model := client.GenerativeModel("gemini-2.5-pro")
 
-	var userInput string
-	if len(messages) > 0 {
-		userInput = messages[len(messages) -1].Content
-	} else {
-		userInput = "Hello"
-	}
 
-	resp, err := model.GenerateContent(ctx, genai.Text(userInput))
+	resp, err := model.GenerateContent(ctx, genai.Text(messages))
 	if err != nil {
 		return "", err
 	}
