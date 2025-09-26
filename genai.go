@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"genai/genai/api"
 	"genai/genai/db"
-	"genai/genai/generate"
+	"genai/genai/func/generate"
 	"log"
 	"os"
 	"strings"
