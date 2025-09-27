@@ -1,9 +1,12 @@
 package main
 
 import (
-	"genai/genai/api"
+	GetByID "genai/genai/api/GetByID"
+	GetChat "genai/genai/api/GetChat"
 	"genai/genai/db"
 	"genai/genai/func/prompt"
+	"log"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +19,7 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/chat", func(c *gin.Context) {
-		api.GetChat(c, dbChat)
+		GetChat.GetChat(c, dbChat)
 	})
 	router.POST("/prompt", func(c *gin.Context) {
 		var req struct {
@@ -27,6 +30,15 @@ func main() {
         return
     }
     prompt.Prompt(c, &dbChat, req.Message)
+	})
+
+	router.GET("/history/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		num, err := strconv.Atoi(id)
+		if err != nil {
+			log.Println("Invalid ID:", err)
+		}
+		GetByID.GetByID(c, num, dbChat)
 	})
 	router.Run("localhost:8080")
 	

@@ -1,6 +1,7 @@
 package db
 
 type Message struct {
+	ID        int
 	User      User
 	Assistant Assistant
 }

@@ -15,6 +15,7 @@ func Prompt(c *gin.Context, dbChat *[]db.Message, message string) {
     }
 
     *dbChat = append(*dbChat, db.Message{
+        ID:       1 + len(*dbChat),
         User:      db.User{Role: "user", Content: message},
         Assistant: db.Assistant{Role: "assistant", Content: newChat},
     })
